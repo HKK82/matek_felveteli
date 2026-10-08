@@ -295,3 +295,16 @@ test('a felvételi témák adatai teljesek, az azonosítók egyediek', () => {
   }
   void gcd;
 });
+
+test('geometria: minden feladathoz tartozik SVG-vázlat (NaN nélkül), az átlóknál a megoldásban is', () => {
+  const rng = ujRng(5);
+  for (const tipus of tema('fv-geometria').tipusok) {
+    for (let i = 0; i < 150; i++) {
+      const f = tipus.general(rng);
+      assert.match(f.abra || '', /^<svg[\s\S]*<\/svg>$/, `${tipus.id}: van ábra – ${sima(f.szoveg)}`);
+      for (const a of [f.abra, f.abraMegoldas || '']) assert.ok(!/NaN|undefined|Infinity/.test(a), `${tipus.id}: tiszta ábra`);
+      assert.match(f.abra, /<title>[^<]+<\/title>/, 'akadálymentes leírás');
+      if (/átlója van/.test(sima(f.szoveg))) assert.ok(f.abraMegoldas, 'az átlós feladat megoldásához is van ábra');
+    }
+  }
+});

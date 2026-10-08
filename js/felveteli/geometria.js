@@ -2,6 +2,7 @@
 import { egesz, valaszt } from '../lib/rng.js';
 import { probal, f, tisztit } from '../temak/seged.js';
 import { egyMezos } from './seged.js';
+import { haromszogAbra, negyszogAbra, sokszogAbra, teglalapAbra, kockaAbra, pitagoraszAbra } from './abrak.js';
 
 // ---- Tiszta számolók ----
 export const harmadikSzog = (a, b) => 180 - a - b;
@@ -25,6 +26,7 @@ function G1(rng) {
     if (valt === 2) {
       const a = 2 * egesz(rng, 20, 60);
       return egyMezos({
+        abra: haromszogAbra({ valt: 2, a }),
         szoveg: `Egy háromszög A csúcsánál lévő belső szög ${a}°. Hány fokos szöget zár be az A csúcsból induló szögfelező a háromszög AB oldalával?`,
         cimke: 'A szög', egyseg: '°', helyes: a / 2,
         hibak: [{ ertek: a, uzenet: 'Ez a teljes belső szög. A szögfelező ezt két egyenlő részre osztja.' }, { ertek: 180 - a, uzenet: 'A szögfelező az A csúcsnál lévő belső szöget felezi, a háromszög többi szögéhez nincs köze.' }],
@@ -44,6 +46,7 @@ function G1(rng) {
     if (valt === 0) {
       const c = 180 - a - b;
       return egyMezos({
+        abra: haromszogAbra({ valt: 0, a, b }),
         szoveg: `Egy háromszög két belső szöge ${a}° és ${b}°. Hány fokos a háromszög harmadik belső szöge?`,
         cimke: 'A harmadik szög', egyseg: '°', helyes: c,
         hibak: [{ ertek: a + b, uzenet: 'Ez a két szög összege. A harmadik szöget úgy kapod meg, hogy ezt kivonod 180 fokból.' }, { ertek: 360 - a - b, uzenet: 'A háromszög belső szögeinek összege 180 fok, nem 360.' }],
@@ -59,6 +62,7 @@ function G1(rng) {
       });
     }
     return egyMezos({
+      abra: haromszogAbra({ valt: 1, a, b }),
       szoveg: `Egy háromszög A csúcsánál lévő belső szög ${a}°, a B csúcsánál lévő ${b}°. Hány fokos a C csúcsnál lévő külső szög?`,
       cimke: 'A külső szög', egyseg: '°', helyes: a + b,
       hibak: [{ ertek: 180 - a - b, uzenet: 'Ez a C csúcsnál lévő belső szög. A külső szög ennek 180 fokra kiegészítő szöge.' }, { ertek: 360 - a - b, uzenet: 'A külső szög és a mellette lévő belső szög együtt 180 fok (egyenesszög).' }],
@@ -88,6 +92,7 @@ function G2(rng) {
     const legkisebb = q * k;
     if (legkisebb + d2 >= 180 || p * k >= 180) return null;
     return egyMezos({
+      abra: negyszogAbra({ p, q, d1, d2 }),
       szoveg: `Egy négyszög két belső szögének aránya ${p} : ${q}. A másik két belső szöge ${d1}°-kal, illetve ${d2}°-kal nagyobb a négyszög legkisebb szögénél. Hány fokos a négyszög legkisebb szöge?`,
       cimke: 'A legkisebb szög', egyseg: '°', helyes: legkisebb,
       hibak: [
@@ -122,6 +127,8 @@ function G3(rng) {
   if (valt === 2) {
     const n = egesz(rng, 5, 12);
     return egyMezos({
+      abra: sokszogAbra({ n, mod: 'atlo' }),
+      abraMegoldas: sokszogAbra({ n, mod: 'atlo-megoldas' }),
       szoveg: `Hány átlója van egy konvex ${n} oldalú sokszögnek?`,
       helyes: atlokSzama(n), tizedes: 0, cimke: 'Az átlók száma',
       hibak: [{ ertek: n * (n - 3), uzenet: 'Így minden átlót kétszer számoltál (mindkét végpontjától egyszer). Oszd el kettővel.' }, { ertek: n * (n - 1) / 2, uzenet: 'Ez az összes szakasz a csúcsok között, az oldalakat is beleszámolva. Az oldalak nem átlók.' }],
@@ -139,6 +146,7 @@ function G3(rng) {
   const n = valaszt(rng, N360);
   const kulso = valt === 1;
   return egyMezos({
+    abra: sokszogAbra({ n, mod: kulso ? 'kulso' : 'belso' }),
     szoveg: `Mekkora egy szabályos ${n} oldalú sokszög egy ${kulso ? 'külső' : 'belső'} szöge (fokban)?`,
     helyes: kulso ? 360 / n : 180 - 360 / n, tizedes: 0, cimke: kulso ? 'A külső szög' : 'A belső szög', egyseg: '°',
     hibak: kulso
@@ -173,6 +181,7 @@ function G4(rng) {
     if (a === b) return null;
     const dT = x * (a + b + x);
     return egyMezos({
+      abra: teglalapAbra({ a, x }),
       szoveg: `Egy téglalap egyik oldala ${a} cm hosszú. A téglalap mindkét oldalát megnöveltük ${x} cm-rel. Az így kapott téglalap területe ${f(dT)} cm²-rel nagyobb az eredeti téglalap területénél. Milyen hosszú a téglalap másik oldala (cm-ben)?`,
       cimke: 'A másik oldal', egyseg: 'cm', helyes: b,
       hibak: [
@@ -207,6 +216,7 @@ function G5(rng) {
     const e = egesz(rng, 6, 12), s = egesz(rng, 2, 3);
     const V = kockaLyukTerfogat(e, s), A = kockaLyukFelszin(e, s);
     return egyMezos({
+      abra: kockaAbra({ e, s }),
       szoveg: `Egy ${e} cm élű tömör kockán az egyik lapra merőlegesen átfúrtunk egy ${s} cm × ${s} cm keresztmetszetű négyzetes lyukat (a lyuk az egyik lapról a szemközti lapig tart). Mekkora a megmaradt test ${felszin ? 'felszíne (cm²-ben)' : 'térfogata (cm³-ben)'}?`,
       cimke: felszin ? 'A felszín' : 'A térfogat', egyseg: felszin ? 'cm²' : 'cm³', helyes: felszin ? A : V,
       hibak: felszin
@@ -246,6 +256,7 @@ function G6(rng) {
     if (c > 90) return null;
     if (valt === 1) {
       return egyMezos({
+        abra: pitagoraszAbra({ mod: 'befogo', a, b, c }),
         szoveg: `Egy derékszögű háromszög átfogója ${c} cm, az egyik befogója ${a} cm hosszú. Milyen hosszú a másik befogó (cm-ben)?`,
         cimke: 'A másik befogó', egyseg: 'cm', helyes: b,
         hibak: [{ ertek: c - a, uzenet: 'A befogó nem a két oldal különbsége. Pitagorasz-tétellel kell számolni: a² + b² = c².' }, { ertek: tisztit(Math.sqrt(c * c + a * a)), uzenet: 'Az átfogó a leghosszabb oldal, ezért a másik befogót az átfogó négyzetéből kell kivonni (nem hozzáadni).' }],
@@ -262,6 +273,7 @@ function G6(rng) {
     }
     const atlo = valt === 2;
     return egyMezos({
+      abra: pitagoraszAbra({ mod: atlo ? 'atlo' : 'atfogo', a, b, c }),
       szoveg: atlo
         ? `Egy téglalap oldalai ${a} cm és ${b} cm hosszúak. Milyen hosszú a téglalap átlója (cm-ben)?`
         : `Egy derékszögű háromszög befogói ${a} cm és ${b} cm hosszúak. Milyen hosszú az átfogó (cm-ben)?`,
