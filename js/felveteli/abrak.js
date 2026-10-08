@@ -156,7 +156,7 @@ export function kockaAbra({ e, s }) {
   r += vonal([x1 + os, y0], [x1 + os, y0 + m], 'abra-seged') + vonal([x1 + os + ks, y0], [x1 + os + ks, y0 + m], 'abra-seged');
   r += szoveg([x1 + m / 2, y0 + m + 22], `${e} cm`, 'abra-felirat');
   r += szoveg([x1 + m + 8, y0 + m / 2], `${e} cm`, 'abra-felirat', 'start');
-  return keret(`Kocka, élhossza ${e} cm, rajta négyzetes lyuk ${s} cm × ${s} cm keresztmetszettel; felülnézet és elölnézet.`, r, 380, 215);
+  return keret(`Kocka, élhossza ${e} cm, rajta négyzetes lyuk ${s} cm × ${s} cm keresztmetszettel; felülnézet és elölnézet.`, r, 410, 215);
 }
 
 // ---- G6: derékszögű háromszög, téglalap átlója ----
